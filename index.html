@@ -16,8 +16,12 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:'Segoe UI','Roboto',sans-serif;background:#fffce6}
 #app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;background:#fffce6;overflow:hidden}
-.bn{background:#4932ff;color:#fff;text-align:center;padding:14px 16px;font-weight:700;font-size:16px;flex-shrink:0}
-.bn2{background:#4932ff;color:#fff;text-align:center;padding:14px 16px;font-weight:700;font-size:16px;margin-top:2px}
+.bn,.bn2{background:#4932ff;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;display:flex;align-items:center;padding:0 10px}
+.bn{} .bn2{margin-top:2px}
+.bn-title{flex:1;padding:14px 0 14px 32px;text-align:left}
+.bn-btn{width:36px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;font-weight:700}
+.bn-btn-x{color:#ff3333}
+.bn-btn-arr{color:#fff}
 #scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
 .row{
@@ -42,8 +46,9 @@ body{font-family:'Segoe UI','Roboto',sans-serif;background:#fffce6}
 
 .bar{background:#fcfcfc;display:flex;padding:6px 2px;border-top:1px solid rgba(0,0,0,.1);flex-shrink:0}
 .bar button{flex:1;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:#000;padding:10px 0;border-radius:6px;margin:0 1px;min-width:0}
-.bar button.on{background:#11fcfc}
-.bar button.mic{background:#f44;color:#fff}
+.bar button.on{background:#4932ff;color:#fff}
+.bar button.on2{background:#11fcfc;color:#000}
+.bar button.mic{background:#4932ff;color:#fff}
 
 #ghost{position:fixed;background:#11fcfc;color:#000;padding:6px 14px;border-radius:8px;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.35);pointer-events:none;z-index:9999;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none}
 #dropline{position:fixed;left:24px;right:24px;height:3px;background:#4932ff;border-radius:2px;z-index:8000;display:none;pointer-events:none}
@@ -51,10 +56,10 @@ body{font-family:'Segoe UI','Roboto',sans-serif;background:#fffce6}
 </head>
 <body>
 <div id="app">
-  <div class="bn">A faire aujourd'hui</div>
+  <div class="bn"><span class="bn-title">A faire aujourd'hui</span><span class="bn-btn bn-btn-x" id="clr-today">✕</span><span class="bn-btn bn-btn-arr" id="mv-down">↓</span></div>
   <div id="scroll">
     <div id="zt"></div>
-    <div class="bn2">A faire plus tard</div>
+    <div class="bn2"><span class="bn-title">A faire plus tard</span><span class="bn-btn bn-btn-x" id="clr-later">✕</span><span class="bn-btn bn-btn-arr" id="mv-up">↑</span></div>
     <div id="zl"></div>
     <div style="height:20px"></div>
   </div>
@@ -124,11 +129,11 @@ const IC={
 };
 function rm(){
   const b=document.getElementById('bar');b.innerHTML='';
-  [{i:IC.plus,f:addT},{i:IC.m1,f:tM1,a:()=>S.m1},{i:IC.m2,f:tM2,a:()=>S.m2},
+  [{i:IC.plus,f:addT},{i:IC.m1,f:tM1,a:()=>S.m1,mc:2},{i:IC.m2,f:tM2,a:()=>S.m2,mc:3},
    {i:IC.cal,f:toCal},{i:IC.del,f:del},{i:IC.mic,f:tMic,a:()=>S.mic,mc:1},{i:IC.x,f:doX}
   ].forEach(x=>{
     const btn=document.createElement('button');
-    if(x.a&&x.a())btn.className=x.mc?'mic':'on';
+    if(x.a&&x.a())btn.className=x.mc===1?'mic':x.mc===3?'on2':'on';
     btn.innerHTML=x.i;btn.addEventListener('click',x.f);b.appendChild(btn);
   });
 }
@@ -359,10 +364,43 @@ function toCal(){
 
 function doX(){
   save();
-  document.getElementById('app').innerHTML=
-    '<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px">'+
+  const app=document.getElementById('app');
+  app.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:24px;padding:32px">'+
     '<div style="font-size:48px">✅</div>'+
-    '<div style="font-size:18px;font-weight:600;color:#4932ff">Données sauvegardées</div></div>';
+    '<div style="font-size:18px;font-weight:600;color:#4932ff">Données sauvegardées</div>'+
+    '<div style="display:flex;gap:16px;margin-top:8px">'+
+    '<button onclick="location.reload()" style="padding:12px 28px;font-size:16px;font-weight:700;background:#4932ff;color:#fff;border:none;border-radius:10px;cursor:pointer">Retour</button>'+
+    '<button onclick="window.close()" style="padding:12px 28px;font-size:16px;font-weight:700;background:#ff3333;color:#fff;border:none;border-radius:10px;cursor:pointer">Quitter</button>'+
+    '</div></div>';
+}
+
+function clrZone(z){
+  if(z==='today'){S.today=[{id:gi(),text:E,empty:true}]}
+  else{S.later=[{id:gi(),text:E,empty:true}]}
+  S.sel=new Set();S.sz=null;save();render();
+}
+
+function mvDown(){
+  // Dernière tâche de today → début de later
+  const t=S.today.filter(x=>!x.empty);if(!t.length)return;
+  const task=t[t.length-1];
+  S.today=S.today.filter(x=>x.id!==task.id);
+  if(!S.today.length||S.today.every(x=>x.empty))S.today=[{id:gi(),text:E,empty:true}];
+  const l=S.later.filter(x=>!x.empty);
+  S.later=[task,...l];
+  save();render();
+}
+
+function mvUp(){
+  // Première tâche de later → fin de today
+  const l=S.later.filter(x=>!x.empty);if(!l.length)return;
+  const task=l[0];
+  S.later=S.later.filter(x=>x.id!==task.id);
+  if(!S.later.length||S.later.every(x=>x.empty))S.later=[{id:gi(),text:E,empty:true}];
+  const t=S.today.filter(x=>!x.empty);
+  S.today=[...t,task];
+  save();render();
 }
 
 // ===== PWA: Register Service Worker =====
@@ -372,6 +410,11 @@ if('serviceWorker' in navigator){
 
 // ===== INIT =====
 load();render();
+
+document.getElementById('clr-today').addEventListener('click',()=>clrZone('today'));
+document.getElementById('clr-later').addEventListener('click',()=>clrZone('later'));
+document.getElementById('mv-down').addEventListener('click',mvDown);
+document.getElementById('mv-up').addEventListener('click',mvUp);
 </script>
 </body>
 </html>
