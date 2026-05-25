@@ -16,61 +16,145 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:'Segoe UI','Roboto',sans-serif;background:#fffce6}
 #app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;background:#fffce6;overflow:hidden}
-.bn,.bn2{background:#4932ff;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;display:flex;align-items:center;padding:0 10px}
-.bn{} .bn2{margin-top:2px}
+
+/* === BARRE HAUTE : titre + croix à droite === */
+.bn{background:#4932ff;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;display:flex;align-items:center;padding:0 10px}
 .bn-title{flex:1;padding:14px 0 14px 32px;text-align:left}
 .bn-btn{width:36px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;font-weight:700}
 .bn-btn-x{color:#ff3333}
-.bn-btn-arr{color:#fff}
-#scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
+/* === BARRE MILIEU : titre | [croix centrée] | [flèches à droite] === */
+.bn2{background:#4932ff;color:#fff;font-weight:700;font-size:16px;flex-shrink:0;display:flex;align-items:center;margin-top:2px;padding:0 10px}
+.bn2-title{padding:14px 0 14px 32px;text-align:left}
+
+/* Croix rouge : flex:1 pour occuper tout l'espace libre et se centrer dedans */
+.bn2-mid{flex:1;display:flex;align-items:center;justify-content:center}
+.bn2-x{
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:#ff3333;
+  font-size:20px;font-weight:900;
+  line-height:1;
+  width:34px;height:34px;
+}
+
+/* Groupe flèches à droite — sans encadrement */
+.bn2-arrows{display:flex;align-items:center;gap:4px}
+.bn2-arr{
+  width:36px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:#fff;
+  font-size:22px;font-weight:900;
+  line-height:1;
+}
+
+#scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .row{
-  display:flex;align-items:center;min-height:32px;
-  border-bottom:1px solid rgba(0,0,0,.06);
-  position:relative;font-size:15px;color:#000;
-  user-select:none;-webkit-user-select:none;
+display:flex;align-items:center;min-height:32px;
+border-bottom:1px solid rgba(0,0,0,.06);
+position:relative;font-size:15px;color:#000;
+user-select:none;-webkit-user-select:none;
 }
 .row .txt{flex:1;padding:5px 4px 5px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .hnd{
-  width:44px;min-height:32px;
-  display:flex;align-items:center;justify-content:center;
-  color:#bbb;font-size:20px;flex-shrink:0;
-  touch-action:none;
-  border-left:1px solid rgba(0,0,0,.06);
+width:44px;min-height:32px;
+display:flex;align-items:center;justify-content:center;
+color:#bbb;font-size:20px;flex-shrink:0;
+touch-action:none;
+border-left:1px solid rgba(0,0,0,.06);
 }
 .row.sel{background:#11fcfc}
 .row.sel .hnd{color:#088}
 .row.emp{font-style:italic;opacity:.5}
 .row.dsrc{opacity:.2}
 .row .inp{width:100%;border:none;outline:none;background:transparent;font:inherit;color:#000;padding:5px 4px 5px 16px}
-
 .bar{background:#fcfcfc;display:flex;padding:6px 2px;border-top:1px solid rgba(0,0,0,.1);flex-shrink:0}
 .bar button{flex:1;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:#000;padding:10px 0;border-radius:6px;margin:0 1px;min-width:0}
 .bar button.on{background:#4932ff;color:#fff}
 .bar button.on2{background:#11fcfc;color:#000}
 .bar button.mic{background:#4932ff;color:#fff}
-
+.bar button:disabled{opacity:0.3;cursor:default}
 #ghost{position:fixed;background:#11fcfc;color:#000;padding:6px 14px;border-radius:8px;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.35);pointer-events:none;z-index:9999;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none}
 #dropline{position:fixed;left:24px;right:24px;height:3px;background:#4932ff;border-radius:2px;z-index:8000;display:none;pointer-events:none}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="bn"><span class="bn-title">A faire aujourd'hui</span><span class="bn-btn bn-btn-x" id="clr-today">✕</span><span class="bn-btn bn-btn-arr" id="mv-down">↓</span></div>
+  <!-- BARRE HAUTE : titre + croix à droite -->
+  <div class="bn">
+    <span class="bn-title">A faire aujourd'hui</span>
+    <span class="bn-btn bn-btn-x" id="clr-today">✕</span>
+  </div>
+
   <div id="scroll">
     <div id="zt"></div>
-    <div class="bn2"><span class="bn-title">A faire plus tard</span><span class="bn-btn bn-btn-x" id="clr-later">✕</span><span class="bn-btn bn-btn-arr" id="mv-up">↑</span></div>
+
+    <!-- BARRE MILIEU : titre | croix (centre) | flèches (droite) -->
+    <div class="bn2">
+      <span class="bn2-title">A faire plus tard</span>
+      <div class="bn2-mid">
+        <span class="bn2-x" id="clr-later">✕</span>
+      </div>
+      <div class="bn2-arrows">
+        <span class="bn2-arr" id="mv-up" title="Monter vers aujourd'hui">&#x2191;</span>
+        <span class="bn2-arr" id="mv-down" title="Descendre vers plus tard">&#x2193;</span>
+      </div>
+    </div>
+
     <div id="zl"></div>
     <div style="height:20px"></div>
   </div>
+
   <div class="bar" id="bar"></div>
 </div>
+
 <div id="ghost"></div>
 <div id="dropline"></div>
+
 <script>
+// ===== CAPITALISE =====
+function capitalize(str){
+  if(!str)return str;
+  return str.charAt(0).toUpperCase()+str.slice(1);
+}
+
 // ===== STATE =====
 const E="Rien à faire";let uid=0;
 function gi(){return't'+(++uid)+'_'+(Math.random()*1e6|0)}
+
+// === UNDO STACK ===
+const undoStack=[];
+const MAX_UNDO=50;
+
+function pushUndo(){
+  undoStack.push({
+    today:JSON.parse(JSON.stringify(S.today)),
+    later:JSON.parse(JSON.stringify(S.later)),
+    sel:[...S.sel],
+    sz:S.sz
+  });
+  if(undoStack.length>MAX_UNDO)undoStack.shift();
+  updateUndoBtn();
+}
+
+function doUndo(){
+  if(!undoStack.length)return;
+  const snap=undoStack.pop();
+  S.today=snap.today;
+  S.later=snap.later;
+  S.sel=new Set(snap.sel);
+  S.sz=snap.sz;
+  S.ed=null;
+  save();render();
+  updateUndoBtn();
+}
+
+function updateUndoBtn(){
+  const btn=document.getElementById('undo-btn');
+  if(btn)btn.disabled=undoStack.length===0;
+}
+
 let S={
   today:[{id:gi(),text:E,empty:true}],
   later:[{id:gi(),text:E,empty:true}],
@@ -95,7 +179,9 @@ const scrollEl=document.getElementById('scroll');
 function render(){
   rz('zt',S.today,'today');rz('zl',S.later,'later');rm();
   if(S.ed){const i=document.getElementById('ei');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+  updateUndoBtn();
 }
+
 function rz(cid,list,zone){
   const c=document.getElementById(cid);c.innerHTML='';
   list.forEach((t,i)=>{
@@ -105,6 +191,10 @@ function rz(cid,list,zone){
     if(S.ed===t.id){
       const inp=document.createElement('input');inp.className='inp';inp.id='ei';
       inp.value=t.empty?'':t.text;inp.maxLength=80;
+      inp.addEventListener('input',()=>{
+        // Capitalize first letter live
+        if(inp.value.length===1){inp.value=inp.value.toUpperCase()}
+      });
       inp.addEventListener('blur',()=>ce(t.id,inp.value));
       inp.addEventListener('keydown',e=>{if(e.key==='Enter')ce(t.id,inp.value);if(e.key==='Escape'){S.ed=null;render()}});
       d.appendChild(inp);
@@ -125,22 +215,37 @@ const IC={
   cal:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   del:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
   mic:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>',
+  undo:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h10a6 6 0 0 1 0 12H7"/><polyline points="7 3 3 7 7 11"/></svg>',
   x:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
 };
+
 function rm(){
   const b=document.getElementById('bar');b.innerHTML='';
-  [{i:IC.plus,f:addT},{i:IC.m1,f:tM1,a:()=>S.m1,mc:2},{i:IC.m2,f:tM2,a:()=>S.m2,mc:3},
-   {i:IC.cal,f:toCal},{i:IC.del,f:del},{i:IC.mic,f:tMic,a:()=>S.mic,mc:1},{i:IC.x,f:doX}
+  // Ordre: + | M1 | M2 | CAL | DEL | MIC | UNDO | X
+  [
+    {i:IC.plus,f:addT},
+    {i:IC.m1,f:tM1,a:()=>S.m1,mc:2},
+    {i:IC.m2,f:tM2,a:()=>S.m2,mc:3},
+    {i:IC.cal,f:toCal},
+    {i:IC.del,f:del},
+    {i:IC.mic,f:tMic,a:()=>S.mic,mc:1},
+    {i:IC.undo,f:doUndo,id:'undo-btn'},
+    {i:IC.x,f:doX}
   ].forEach(x=>{
     const btn=document.createElement('button');
     if(x.a&&x.a())btn.className=x.mc===1?'mic':x.mc===3?'on2':'on';
-    btn.innerHTML=x.i;btn.addEventListener('click',x.f);b.appendChild(btn);
+    if(x.id)btn.id=x.id;
+    btn.innerHTML=x.i;
+    btn.addEventListener('click',x.f);
+    b.appendChild(btn);
   });
+  updateUndoBtn();
 }
 
 // ===== TAP =====
 let ddf=false;
 let ltId=null,ltT=0;
+
 scrollEl.addEventListener('click',function(e){
   if(ddf)return;
   if(e.target.closest('.hnd')||e.target.closest('.inp'))return;
@@ -180,13 +285,15 @@ function handleDbl(id){
 
 function ce(id,val){
   const z=zn(id);if(!z)return;const t=ts(z);
-  if(!val.trim()){const r=t.filter(x=>x.id!==id);st(z,r.length?r:[{id:gi(),text:E,empty:true}])}
-  else st(z,t.map(x=>x.id===id?{...x,text:val.trim(),empty:false}:x));
+  const trimmed=val.trim();
+  const finalVal=trimmed?capitalize(trimmed):trimmed;
+  if(!finalVal){const r=t.filter(x=>x.id!==id);st(z,r.length?r:[{id:gi(),text:E,empty:true}])}
+  else st(z,t.map(x=>x.id===id?{...x,text:finalVal,empty:false}:x));
   S.ed=null;save();render();
 }
 
 // ===========================================================
-//  DRAG & DROP — Math-based positioning (no elementsFromPoint)
+// DRAG & DROP — Math-based positioning (no elementsFromPoint)
 // ===========================================================
 let DA=false,DI=[],DZ=null,DX=-1,hitMap=[];
 
@@ -261,7 +368,9 @@ scrollEl.addEventListener('touchmove',function(e){
 },{passive:false,capture:true});
 
 scrollEl.addEventListener('touchend',function(e){
-  if(!DA)return;e.preventDefault();executeDrop();endDrag();
+  if(!DA)return;e.preventDefault();
+  pushUndo(); // snapshot avant drop
+  executeDrop();endDrag();
 },{passive:false,capture:true});
 
 scrollEl.addEventListener('touchcancel',function(e){
@@ -294,22 +403,22 @@ function endDrag(){
 }
 
 // ===========================================================
-//  SPEECH RECOGNITION
+// SPEECH RECOGNITION
 // ===========================================================
 let recog=null;
 function tMic(){S.mic?stopMic():startMic()}
-
 function startMic(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){alert("Reconnaissance vocale non supportée par ce navigateur.");return}
   recog=new SR();recog.lang='fr-FR';recog.interimResults=false;recog.continuous=true;
   recog.onresult=function(ev){
     const r=ev.results[ev.results.length-1];if(!r.isFinal)return;
-    const txt=r[0].transcript.trim();if(!txt)return;
+    const txt=capitalize(r[0].transcript.trim());if(!txt)return;
     if(S.ed){
       const inp=document.getElementById('ei');
       if(inp){inp.value=inp.value?inp.value+' '+txt:txt;inp.focus()}
     } else {
+      pushUndo();
       const n={id:gi(),text:txt,empty:false};
       const te=S.today.length===1&&S.today[0].empty;
       if(te)S.today=[n];else S.today.push(n);
@@ -327,6 +436,7 @@ function stopMic(){S.mic=false;if(recog){try{recog.stop()}catch(e){}}recog=null;
 
 // ===== ACTIONS =====
 function addT(){
+  pushUndo();
   const n={id:gi(),text:'',empty:false};
   const le=S.later.length===1&&S.later[0].empty,ls=le&&S.sel.has(S.later[0].id);
   if(ls){S.later=[n];S.ed=n.id;S.sel=new Set([n.id]);S.sz='later';render();return}
@@ -345,6 +455,7 @@ function tM2(){S.m2=!S.m2;if(S.m2)S.m1=false;render()}
 
 function del(){
   if(!S.sel.size)return;
+  pushUndo();
   let nT=S.today.filter(t=>!S.sel.has(t.id)),nL=S.later.filter(t=>!S.sel.has(t.id));
   S.today=nT.length?nT:[{id:gi(),text:E,empty:true}];
   S.later=nL.length?nL:[{id:gi(),text:E,empty:true}];
@@ -376,6 +487,7 @@ function doX(){
 }
 
 function clrZone(z){
+  pushUndo();
   if(z==='today'){S.today=[{id:gi(),text:E,empty:true}]}
   else{S.later=[{id:gi(),text:E,empty:true}]}
   S.sel=new Set();S.sz=null;save();render();
@@ -384,6 +496,7 @@ function clrZone(z){
 function mvDown(){
   // Dernière tâche de today → début de later
   const t=S.today.filter(x=>!x.empty);if(!t.length)return;
+  pushUndo();
   const task=t[t.length-1];
   S.today=S.today.filter(x=>x.id!==task.id);
   if(!S.today.length||S.today.every(x=>x.empty))S.today=[{id:gi(),text:E,empty:true}];
@@ -395,6 +508,7 @@ function mvDown(){
 function mvUp(){
   // Première tâche de later → fin de today
   const l=S.later.filter(x=>!x.empty);if(!l.length)return;
+  pushUndo();
   const task=l[0];
   S.later=S.later.filter(x=>x.id!==task.id);
   if(!S.later.length||S.later.every(x=>x.empty))S.later=[{id:gi(),text:E,empty:true}];
@@ -410,7 +524,6 @@ if('serviceWorker' in navigator){
 
 // ===== INIT =====
 load();render();
-
 document.getElementById('clr-today').addEventListener('click',()=>clrZone('today'));
 document.getElementById('clr-later').addEventListener('click',()=>clrZone('later'));
 document.getElementById('mv-down').addEventListener('click',mvDown);
